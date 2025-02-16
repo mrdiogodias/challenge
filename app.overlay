@@ -1,0 +1,8 @@
+&arduino_i2c {
+	status = "okay";
+
+	bmi270@68 {
+		compatible = "bosch,bmi270";
+		reg = <0x68>;
+	};
+};

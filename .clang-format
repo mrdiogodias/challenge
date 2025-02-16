@@ -1,0 +1,19 @@
+﻿---
+BasedOnStyle: Google
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveMacros: 'true'
+AlignConsecutiveAssignments: 'false'
+AlignConsecutiveDeclarations: 'false'
+AlignEscapedNewlines: Left
+AlignTrailingComments: 'true'
+AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AlwaysBreakBeforeMultilineStrings: 'true'
+BinPackArguments: 'true'
+BinPackParameters: 'true'
+ColumnLimit: '125'
+IndentCaseLabels: 'true'
+IndentPPDirectives: BeforeHash
+IndentWidth: '4'
+...
