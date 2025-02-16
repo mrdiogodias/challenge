@@ -11,7 +11,7 @@
 
 int main(void) {
     int ret = 0;
-    const struct device *const dev = DEVICE_DT_GET_ONE(bosch_bmi270);
+    const struct device *const dev = DEVICE_DT_GET_ONE(bosch_bmi270plus);
     struct sensor_value acc[3], gyr[3];
     struct sensor_value full_scale, sampling_freq, oversampling;
 
