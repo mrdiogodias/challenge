@@ -257,10 +257,14 @@
 #define BMI270_SET_BITS_POS_0(reg_data, bitname, data) \
 	((reg_data & ~(bitname##_MSK)) | (data & bitname##_MSK))
 
+/* Sensor specific channels for BMI270 */
+#define SENSOR_CHAN_STEP_CNT (SENSOR_CHAN_PRIV_START + 1)
+
 struct bmi270_data {
 	int16_t ax, ay, az, gx, gy, gz;
 	uint8_t acc_range, acc_odr, gyr_odr;
 	uint16_t gyr_range;
+	uint16_t step_counter;
 
 #if CONFIG_BMI270_PLUS_TRIGGER
 	const struct device *dev;
