@@ -14,4 +14,11 @@ properties:
   irq-gpios:
     type: phandle-array
     description: |
-      The INT1 and (optional) INT2 signal connections.
+      The INT1 and (optional) INT2 signal connections.step-counter:
+
+  step-counter:
+    type: boolean
+    description: Enable step counter feature in BMI270
+
+
+    

@@ -4,5 +4,6 @@
 	bmi270plus@68 {
 		compatible = "bosch,bmi270plus";
 		reg = <0x68>;
+		step-counter;
 	};
 };

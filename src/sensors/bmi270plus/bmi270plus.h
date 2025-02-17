@@ -303,6 +303,7 @@ struct bmi270_feature_config {
 	size_t config_file_len;
 	struct bmi270_feature_reg *anymo_1;
 	struct bmi270_feature_reg *anymo_2;
+	struct bmi270_feature_reg *step_counter;
 };
 
 union bmi270_bus {

@@ -610,6 +610,56 @@ static int bmi270_attr_set(
     return ret;
 }
 
+static int bmi270_feature_reg_write(const struct device *dev, const struct bmi270_feature_reg *reg, uint16_t value) {
+    int ret;
+    uint8_t feat_page = reg->page;
+
+    ret = bmi270_reg_write(dev, BMI270_REG_FEAT_PAGE, &feat_page, 1);
+    if (ret < 0) {
+        LOG_ERR("bmi270_reg_write (0x%02x) failed: %d", BMI270_REG_FEAT_PAGE, ret);
+        return ret;
+    }
+
+    LOG_DBG("feature reg[0x%02x]@%d = 0x%04x", reg->addr, reg->page, value);
+
+    ret = bmi270_reg_write(dev, reg->addr, (uint8_t *)&value, sizeof(value));
+    if (ret < 0) {
+        LOG_ERR("bmi270_reg_write (0x%02x) failed: %d", reg->addr, ret);
+        return ret;
+    }
+
+    return 0;
+}
+
+static int bmi270_step_counter_config(const struct device *dev) {
+    const struct bmi270_config *cfg = dev->config;
+    int ret;
+
+    if (!cfg->feature || !cfg->feature->step_counter) {
+        LOG_ERR("Step counter register not defined");
+        return -EINVAL;
+    }
+
+    /* Set feature page to 2 */
+    uint8_t feat_page = 2;
+    ret = bmi270_reg_write(dev, BMI270_REG_FEAT_PAGE, &feat_page, 1);
+    if (ret < 0) {
+        LOG_ERR("Failed to set feature page: %d", ret);
+        return ret;
+    }
+
+    /* Enable step counter by writing '1' to register 0x3A */
+    uint16_t step_counter_enable = 1;
+    ret = bmi270_feature_reg_write(dev, cfg->feature->step_counter, step_counter_enable);
+    if (ret < 0) {
+        LOG_ERR("Failed to enable step counter");
+        return ret;
+    }
+
+    LOG_INF("Step counter enabled successfully.");
+    return 0;
+}
+
 static int bmi270_init(const struct device *dev) {
     int ret;
     struct bmi270_data *data = dev->data;
@@ -722,6 +772,12 @@ static int bmi270_init(const struct device *dev) {
     }
 #endif
 
+    ret = bmi270_step_counter_config(dev);
+    if (ret) {
+        LOG_ERR("Could not configure step counter %d", ret);
+        return ret;
+    }
+
     adv_pwr_save = BMI270_SET_BITS_POS_0(adv_pwr_save, BMI270_PWR_CONF_ADV_PWR_SAVE, BMI270_PWR_CONF_ADV_PWR_SAVE_EN);
     ret = bmi270_reg_write_with_delay(dev, BMI270_REG_PWR_CONF, &adv_pwr_save, 1, BMI270_INTER_WRITE_DELAY_US);
 
@@ -749,10 +805,11 @@ static const struct bmi270_feature_config bmi270_feature_base = {
     .config_file_len = sizeof(bmi270_config_file_base),
     .anymo_1 = &(struct bmi270_feature_reg){.page = 1, .addr = 0x3C},
     .anymo_2 = &(struct bmi270_feature_reg){.page = 1, .addr = 0x3E},
+    .step_counter = &(struct bmi270_feature_reg){.page = 4, .addr = 0x32},
 };
 
 #define BMI270_FEATURE(inst) \
-    (DT_INST_NODE_HAS_COMPAT(inst, bosch_bmi270_base) ? &bmi270_feature_base : &bmi270_feature_max_fifo)
+    (DT_INST_NODE_HAS_COMPAT(inst, bosch_step_counter) ? &bmi270_feature_base : &bmi270_feature_max_fifo)
 
 #if CONFIG_BMI270_PLUS_TRIGGER
     #define BMI270_CONFIG_INT(inst)                                      \
